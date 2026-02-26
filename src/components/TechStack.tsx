@@ -74,10 +74,10 @@ export default function TechStack() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-center gap-4 mb-12">
-          <div className="p-3 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl">
+          <div className="p-3 bg-gradient-to-r from-[#088395] to-[#09637E] rounded-xl">
             <Code className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-[#088395] to-[#09637E] bg-clip-text text-transparent">
             Tech Stack
           </h2>
         </div>
@@ -110,11 +110,15 @@ export default function TechStack() {
                   key={index}
                   className="flex-shrink-0 w-1/4 px-4 select-none"
                 >
-                  <div className="bg-slate-900/50 backdrop-blur-sm border border-cyan-400/20 rounded-lg p-6 text-center hover:bg-slate-800/50 hover:border-cyan-400/50 hover:shadow-lg hover:shadow-cyan-400/25 transition-all duration-500 transform hover:scale-105 hover:transform-[rotateY(15deg)_rotateX(-10deg)] transform-3d">
-                    <tech.icon className="w-12 h-12 mx-auto mb-4 text-cyan-400 transition-transform duration-500 hover:scale-110 transform-3d" />
-                    <h3 className="text-lg font-semibold text-white transition-transform duration-500 hover:scale-105 transform-3d">
-                      {tech.name}
-                    </h3>
+                  <div className="bg-slate-900/30 backdrop-blur-md border border-[#088395]/20 rounded-lg p-6 text-center hover:bg-slate-800/40 hover:border-[#088395]/50 hover:shadow-lg hover:shadow-[#088395]/25 transition-all duration-500 transform hover:scale-105 hover:transform-[rotateY(15deg)_rotateX(-10deg)] transform-3d relative overflow-hidden">
+                    {/* Subtle glass effect glow */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#088395]/10 to-transparent pointer-events-none"></div>
+                    <div className="relative z-10">
+                      <tech.icon className="w-12 h-12 mx-auto mb-4 text-[#088395] transition-transform duration-500 hover:scale-110 transform-3d" />
+                      <h3 className="text-lg font-semibold text-white transition-transform duration-500 hover:scale-105 transform-3d">
+                        {tech.name}
+                      </h3>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -128,7 +132,7 @@ export default function TechStack() {
               {/* Previous Button */}
               <button
                 onClick={handlePrevious}
-                className="bg-cyan-500/80 hover:bg-cyan-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="bg-[#088395]/80 hover:bg-[#09637E] text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
                 aria-label="Previous"
               >
                 <ChevronLeft className="w-6 h-6" />
@@ -144,7 +148,7 @@ export default function TechStack() {
                     }}
                     className={`w-3 h-3 rounded-full transition-all duration-300 ${
                       currentIndex === index
-                        ? "bg-cyan-500 w-8"
+                        ? "bg-[#088395] w-8"
                         : "bg-gray-600 hover:bg-gray-500"
                     }`}
                     aria-label={`Go to slide ${index + 1}`}
@@ -155,7 +159,7 @@ export default function TechStack() {
               {/* Next Button */}
               <button
                 onClick={handleNext}
-                className="bg-cyan-500/80 hover:bg-cyan-600 text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+                className="bg-[#088395]/80 hover:bg-[#09637E] text-white p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
                 aria-label="Next"
               >
                 <ChevronRight className="w-6 h-6" />

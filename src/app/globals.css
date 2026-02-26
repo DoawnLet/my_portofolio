@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/variables.css";
 
 :root {
   --background: #ffffff;
@@ -62,7 +63,7 @@ body {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: linear-gradient(45deg, #00ffff, #ff00ff);
+  background: linear-gradient(45deg, #088395, #7ab2b2);
   border-radius: 50%;
   pointer-events: none;
   animation: cursor-trail 0.6s ease-out forwards;
@@ -74,7 +75,7 @@ body {
   height: 20px;
   background: radial-gradient(
     circle,
-    rgba(0, 255, 255, 0.3) 0%,
+    rgba(8, 131, 149, 0.3) 0%,
     transparent 70%
   );
   border-radius: 50%;
@@ -88,11 +89,117 @@ body {
   height: 40px;
   background: radial-gradient(
     circle,
-    rgba(255, 0, 255, 0.5) 0%,
+    rgba(9, 99, 126, 0.5) 0%,
     transparent 70%
   );
 }
 
 .cursor-glow.click {
   animation: cursor-pulse 0.2s ease;
+}
+
+/* ==================== Scroll-reveal & entrance animations ==================== */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s ease both;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease both;
+}
+
+.animate-slide-left {
+  animation: slide-in-left 0.6s ease both;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease both;
+}
+
+/* Stagger delay helpers */
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+/* Shimmer effect for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Line-clamp utility (fallback for older Tailwind) */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

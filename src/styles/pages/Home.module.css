@@ -1,0 +1,57 @@
+/* =====================================================
+   Home.module.css — app/page.tsx
+   ===================================================== */
+
+.root {
+  position: relative;
+  min-height: 100vh;
+  /* Background matches the teal palette */
+  background: linear-gradient(
+    160deg,
+    #081a21 0%,
+    #09637e 40%,
+    #088395 70%,
+    #071217 100%
+  );
+  overflow-x: hidden;
+}
+
+/* Decorative blobs */
+.blobTopLeft {
+  position: fixed;
+  top: -8rem;
+  left: -8rem;
+  width: 36rem;
+  height: 36rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(8, 131, 149, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(48px);
+}
+
+.blobBottomRight {
+  position: fixed;
+  bottom: -8rem;
+  right: -8rem;
+  width: 40rem;
+  height: 40rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(122, 178, 178, 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(64px);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+}

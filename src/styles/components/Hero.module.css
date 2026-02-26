@@ -1,0 +1,82 @@
+/* =====================================================
+   Hero.module.css
+   ===================================================== */
+
+.section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--section-px);
+}
+
+.inner {
+  max-width: 80rem;
+  margin-inline: auto;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.heading {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  background: var(--gradient-brand-full);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: float 3s ease-in-out infinite;
+}
+
+.subtext {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  color: var(--color-accent);
+  margin-bottom: 2rem;
+  max-width: 48rem;
+  margin-inline: auto;
+  line-height: 1.7;
+}
+
+.cta {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: var(--gradient-brand);
+  color: var(--color-light);
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-slow);
+  box-shadow: var(--shadow-brand);
+}
+
+.cta:hover {
+  transform: scale(1.05) perspective(500px) rotateX(10deg);
+  box-shadow: var(--shadow-brand-lg);
+}
+
+/* Parallax divider below hero */
+.parallaxDivider {
+  width: 100%;
+  min-height: 160px;
+  background-image: url("/parallax-bg.svg");
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}

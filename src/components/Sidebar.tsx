@@ -75,7 +75,7 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
       {/* Mobile Toggle Button - Top Left */}
       <button
         onClick={onToggle}
-        className="md:hidden fixed top-4 left-4 z-[60] bg-white backdrop-blur-md border border-gray-300 rounded-lg p-3 hover:border-cyan-500 transition-all duration-300 hover:scale-110 shadow-lg"
+        className="md:hidden fixed top-4 left-4 z-[60] bg-white backdrop-blur-md border border-gray-300 rounded-lg p-3 hover:border-[#088395] transition-all duration-300 hover:scale-110 shadow-lg"
         aria-label="Toggle documentation sidebar"
       >
         {isOpen ? (
@@ -106,11 +106,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
             <div className="flex items-center justify-between">
               {isExpanded && (
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-linear-to-r from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-linear-to-r from-[#088395] to-[#09637E] rounded-lg flex items-center justify-center flex-shrink-0">
                     <Code className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold bg-linear-to-r from-cyan-500 to-violet-600 bg-clip-text text-transparent">
+                    <h2 className="text-base font-bold bg-linear-to-r from-[#088395] to-[#09637E] bg-clip-text text-transparent">
                       ASP.NET Docs
                     </h2>
                     <p className="text-xs text-gray-600">Framework Guide</p>
@@ -144,16 +144,16 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                       isExpanded ? "px-4 space-x-3" : "px-0 justify-center"
                     } py-3 rounded-lg transition-all duration-200 relative ${
                       activeSection === item.id
-                        ? "bg-cyan-50 border border-cyan-300 text-cyan-700"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-cyan-600"
+                        ? "bg-[#EBF4F6] border border-[#088395]/40 text-[#09637E]"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-[#088395]"
                     }`}
                     title={!isExpanded ? item.label : undefined}
                   >
                     <Icon
                       className={`w-5 h-5 flex-shrink-0 ${
                         activeSection === item.id
-                          ? "text-cyan-600"
-                          : "text-gray-500 group-hover:text-cyan-600"
+                          ? "text-[#088395]"
+                          : "text-gray-500 group-hover:text-[#088395]"
                       }`}
                     />
                     {isExpanded && (
@@ -195,11 +195,11 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
           {/* Mobile Header */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-linear-to-r from-cyan-500 to-violet-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-linear-to-r from-[#088395] to-[#09637E] rounded-lg flex items-center justify-center">
                 <Code className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold bg-linear-to-r from-cyan-500 to-violet-600 bg-clip-text text-transparent">
+                <h2 className="text-xl font-bold bg-linear-to-r from-[#088395] to-[#09637E] bg-clip-text text-transparent">
                   ASP.NET Docs
                 </h2>
                 <p className="text-sm text-gray-600">Framework Guide</p>
@@ -218,14 +218,14 @@ export default function Sidebar({ isOpen, onToggle }: SidebarProps) {
                     onClick={() => scrollToSection(item.id)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       activeSection === item.id
-                        ? "bg-cyan-50 border border-cyan-300 text-cyan-700"
-                        : "text-gray-700 hover:bg-gray-100 hover:text-cyan-600"
+                        ? "bg-[#EBF4F6] border border-[#088395]/40 text-[#09637E]"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-[#088395]"
                     }`}
                   >
                     <Icon
                       className={`w-5 h-5 ${
                         activeSection === item.id
-                          ? "text-cyan-600"
+                          ? "text-[#088395]"
                           : "text-gray-500"
                       }`}
                     />

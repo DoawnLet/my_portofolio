@@ -42,7 +42,7 @@ export async function GET() {
         },
         // Revalidate every 1 hour
         next: { revalidate: 3600 },
-      }
+      } as RequestInit & { next: { revalidate: number } },
     );
 
     if (!response.ok) {
@@ -69,7 +69,7 @@ export async function GET() {
       }))
       .sort(
         (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
       );
 
     return NextResponse.json({
@@ -86,7 +86,7 @@ export async function GET() {
         repos: [],
         count: 0,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

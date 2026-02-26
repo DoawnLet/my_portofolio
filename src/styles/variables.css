@@ -1,0 +1,53 @@
+/* =====================================================
+   Global CSS Variables — Color Palette & Tokens
+   ===================================================== */
+
+:root {
+  /* Brand Colors */
+  --color-primary: #09637e;
+  --color-secondary: #088395;
+  --color-accent: #7ab2b2;
+  --color-light: #ebf4f6;
+
+  /* Opacity variants */
+  --color-primary-10: rgba(9, 99, 126, 0.1);
+  --color-primary-20: rgba(9, 99, 126, 0.2);
+  --color-primary-30: rgba(9, 99, 126, 0.3);
+  --color-primary-50: rgba(9, 99, 126, 0.5);
+  --color-secondary-10: rgba(8, 131, 149, 0.1);
+  --color-secondary-20: rgba(8, 131, 149, 0.2);
+  --color-accent-20: rgba(122, 178, 178, 0.2);
+  --color-light-10: rgba(235, 244, 246, 0.1);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(to right, #088395, #09637e);
+  --gradient-brand-full: linear-gradient(to right, #088395, #09637e, #7ab2b2);
+  --gradient-brand-br: linear-gradient(
+    to bottom right,
+    rgba(8, 131, 149, 0.1),
+    transparent
+  );
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: var(--font-geist-mono, ui-monospace, monospace);
+
+  /* Spacing tokens */
+  --section-px: clamp(1rem, 4vw, 2rem);
+  --section-py: 5rem;
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Transition */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+  --transition-slow: 500ms ease;
+
+  /* Shadow */
+  --shadow-brand: 0 4px 24px rgba(8, 131, 149, 0.25);
+  --shadow-brand-lg: 0 8px 40px rgba(8, 131, 149, 0.3);
+}

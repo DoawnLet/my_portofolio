@@ -1,0 +1,85 @@
+/* =====================================================
+   Projects.module.css
+   ===================================================== */
+
+.section {
+  padding-block: var(--section-py);
+  padding-inline: var(--section-px);
+  position: relative;
+  z-index: 10;
+}
+
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.filterBtn {
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.filterBtnActive {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--shadow-brand);
+}
+
+.filterBtnInactive {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: rgba(209, 213, 219, 1);
+}
+
+.filterBtnInactive:hover {
+  border-color: var(--color-secondary-50);
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.empty {
+  text-align: center;
+  padding-block: 4rem;
+  color: rgba(107, 114, 128, 1);
+}
+
+.ctaRow {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-brand);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-brand);
+}
+
+.ctaBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-brand-lg);
+}

@@ -1,0 +1,107 @@
+/* =====================================================
+   TechStack.module.css
+   ===================================================== */
+
+.section {
+  padding-block: var(--section-py);
+  padding-inline: var(--section-px);
+  position: relative;
+  z-index: 10;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.headerIcon {
+  padding: 0.75rem;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-lg);
+}
+
+.headerTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.carouselWrapper {
+  position: relative;
+}
+
+.card {
+  background: rgba(9, 99, 126, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-secondary-20);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--transition-slow),
+    box-shadow var(--transition-slow),
+    border-color var(--transition-slow);
+}
+
+.card:hover {
+  transform: scale(1.05) rotateY(15deg) rotateX(-10deg);
+  border-color: var(--color-secondary-50);
+  box-shadow: var(--shadow-brand);
+}
+
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-brand-br);
+  pointer-events: none;
+}
+
+.techName {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+
+.navBtn {
+  background: rgba(8, 131, 149, 0.8);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+  box-shadow: var(--shadow-brand);
+}
+
+.navBtn:hover {
+  background: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.dot {
+  height: 6px;
+  border-radius: 9999px;
+  transition: all var(--transition-fast);
+}
+
+.dotActive {
+  background: var(--color-secondary);
+  width: 2rem;
+}
+
+.dotInactive {
+  background: rgba(107, 114, 128, 0.7);
+  width: 0.75rem;
+}

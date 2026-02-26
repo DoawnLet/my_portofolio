@@ -1,0 +1,88 @@
+/* =====================================================
+   CookieConsent.module.css
+   ===================================================== */
+
+.banner {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: min(90vw, 36rem);
+  background: rgba(9, 99, 126, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-secondary-30);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-brand-lg);
+  animation: slideUp 0.4s ease;
+}
+
+.title {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+.text {
+  font-size: 0.875rem;
+  color: var(--color-accent);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.acceptBtn {
+  flex: 1;
+  min-width: 100px;
+  padding: 0.625rem 1.25rem;
+  background: var(--gradient-brand);
+  color: var(--color-light);
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-brand);
+}
+
+.acceptBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-brand-lg);
+}
+
+.declineBtn {
+  padding: 0.625rem 1.25rem;
+  background: transparent;
+  color: var(--color-accent);
+  font-weight: 500;
+  font-size: 0.9rem;
+  border: 1px solid var(--color-secondary-30);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.declineBtn:hover {
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

@@ -1,96 +1,258 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { User, Code2, Rocket, Heart } from "lucide-react";
-import Interactive3D from "./Interactive3D";
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const Box = motion.div as React.FC<any>;
+const Section = motion.section as React.FC<any>;
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
+// ─── Animation variants ───────────────────────────────────────────────────────
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.18, delayChildren: 0.05 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
+const headingVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
+const iconVariants = {
+  hidden: { scale: 0.6, opacity: 0, rotate: -15 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    rotate: 0,
+    transition: { duration: 0.6, ease: "backOut" },
+  },
+};
+
+// ─── Card data ────────────────────────────────────────────────────────────────
+const cards = [
+  {
+    icon: User,
+    title: "Who I Am",
+    color: "#088395",
+    text: "I'm a passionate full-stack developer with a love for creating immersive digital experiences. My journey in tech started with curiosity and has evolved into a career dedicated to pushing the boundaries of what's possible in web development.",
+    glow: "rgba(8,131,149,0.14)",
+  },
+  {
+    icon: Code2,
+    title: "What I Do",
+    color: "#09637E",
+    text: "I specialize in modern web technologies, from responsive front-end interfaces to scalable back-end systems. I enjoy working with React, Next.js, TypeScript, and exploring emerging technologies like AI integration and Web3.",
+    glow: "rgba(9,99,126,0.14)",
+  },
+  {
+    icon: Rocket,
+    title: "My Mission",
+    color: "#7AB2B2",
+    text: "To create digital solutions that not only function flawlessly but also inspire and delight users. I believe in the power of technology to solve real-world problems and improve lives.",
+    glow: "rgba(122,178,178,0.14)",
+  },
+  {
+    icon: Heart,
+    title: "Beyond Code",
+    color: "#088395",
+    text: "When I'm not coding, you'll find me exploring new technologies, contributing to open-source projects, or sharing knowledge with the developer community. I believe in continuous learning and giving back.",
+    glow: "rgba(8,131,149,0.14)",
+  },
+];
+
+// ─── Individual Glass Card ────────────────────────────────────────────────────
+function AboutCard({
+  icon: Icon,
+  title,
+  color,
+  text,
+  glow,
+}: (typeof cards)[0]) {
+  return (
+    <Box
+      variants={cardVariants}
+      whileHover={{ y: -10, transition: { duration: 0.3, ease: "easeOut" } }}
+      className="group relative rounded-2xl overflow-hidden cursor-default"
+      style={{
+        background: "rgba(122,178,178,0.06)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(8,131,149,0.18)",
+        boxShadow: "0 4px 32px rgba(9,99,126,0.07)",
+        transition: "border-color 0.3s, box-shadow 0.3s",
+      }}
+      onMouseEnter={(e: React.MouseEvent<HTMLDivElement>) => {
+        (e.currentTarget as HTMLDivElement).style.borderColor = `${color}60`;
+        (e.currentTarget as HTMLDivElement).style.boxShadow =
+          `0 12px 48px ${glow}`;
+      }}
+      onMouseLeave={(e: React.MouseEvent<HTMLDivElement>) => {
+        (e.currentTarget as HTMLDivElement).style.borderColor =
+          "rgba(8,131,149,0.18)";
+        (e.currentTarget as HTMLDivElement).style.boxShadow =
+          "0 4px 32px rgba(9,99,126,0.07)";
+      }}
+    >
+      {/* Radial glow on hover */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+        style={{
+          background: `radial-gradient(circle at 30% 40%, ${glow}, transparent 65%)`,
+        }}
+      />
+
+      <div className="relative z-10 p-7">
+        {/* Animated icon badge */}
+        <Box
+          variants={iconVariants}
+          className="mb-5 inline-flex items-center justify-center w-12 h-12 rounded-xl"
+          style={{
+            background: `linear-gradient(135deg, ${color}1A, ${color}33)`,
+            border: `1px solid ${color}40`,
+          }}
+        >
+          <Icon className="w-6 h-6" style={{ color }} />
+        </Box>
+
+        {/* Title */}
+        <h3
+          className="text-lg font-bold mb-3"
+          style={{
+            background: `linear-gradient(90deg, ${color}, #09637E)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          {title}
+        </h3>
+
+        {/* Body text */}
+        <p className="text-[#7AB2B2]/80 leading-relaxed text-sm">{text}</p>
+      </div>
+    </Box>
+  );
+}
+
+// ─── About Section ────────────────────────────────────────────────────────────
 export default function About() {
   return (
-    <section id="about" className="py-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <div className="p-3 bg-gradient-to-r from-cyan-500 to-violet-600 rounded-xl">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">
-            About
+    <Section
+      id="about"
+      className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden"
+    >
+      {/* Background accent blobs */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full opacity-[0.08] blur-[80px]"
+        style={{
+          background: "radial-gradient(circle, #7AB2B2, transparent 70%)",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full opacity-[0.07] blur-[64px]"
+        style={{
+          background: "radial-gradient(circle, #088395, transparent 70%)",
+        }}
+      />
+
+      <div className="relative z-10 max-w-6xl mx-auto">
+        {/* ── Section heading ── */}
+        <Box
+          variants={headingVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.3 }}
+          className="text-center mb-16"
+        >
+          <span
+            className="inline-block text-xs font-semibold tracking-[0.3em] uppercase text-[#7AB2B2] border border-[#7AB2B2]/30 rounded-full px-5 py-2 mb-5"
+            style={{
+              background: "rgba(8,131,149,0.06)",
+              backdropFilter: "blur(8px)",
+            }}
+          >
+            About Me
+          </span>
+          <h2 className="text-5xl md:text-6xl font-black leading-tight">
+            <span className="bg-gradient-to-r from-[#EBF4F6] via-[#7AB2B2] to-[#EBF4F6] bg-clip-text text-transparent">
+              The Person
+            </span>
+            <br />
+            <span className="bg-gradient-to-r from-[#088395] to-[#09637E] bg-clip-text text-transparent">
+              Behind the Code
+            </span>
           </h2>
-        </div>
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <div className="bg-slate-900/50 backdrop-blur-sm border border-cyan-400/20 rounded-lg p-6 transform hover:scale-105 transition-all duration-500 transform-3d hover:transform-[rotateY(5deg)]">
-              <div className="flex items-center space-x-3 mb-4">
-                <User className="w-8 h-8 text-cyan-400" />
-                <h3 className="text-xl font-semibold text-white">Who I Am</h3>
-              </div>
-              <p className="text-gray-300 leading-relaxed">
-                I&apos;m a passionate full-stack developer with a love for
-                creating immersive digital experiences. My journey in tech
-                started with curiosity and has evolved into a career dedicated
-                to pushing the boundaries of what&apos;s possible in web
-                development.
-              </p>
-            </div>
+        </Box>
 
-            <div className="bg-slate-900/50 backdrop-blur-sm border border-violet-500/20 rounded-lg p-6 transform hover:scale-105 transition-all duration-500 transform-3d hover:transform-[rotateY(-5deg)]">
-              <div className="flex items-center space-x-3 mb-4">
-                <Code2 className="w-8 h-8 text-violet-400" />
-                <h3 className="text-xl font-semibold text-white">What I Do</h3>
-              </div>
-              <p className="text-gray-300 leading-relaxed">
-                I specialize in modern web technologies, from responsive
-                front-end interfaces to scalable back-end systems. I enjoy
-                working with React, Next.js, TypeScript, and exploring emerging
-                technologies like AI integration and Web3.
-              </p>
-            </div>
-          </div>
+        {/* ── Staggered cards grid ── */}
+        <Box
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.2 }}
+          className="grid sm:grid-cols-2 gap-5"
+        >
+          {cards.map((card) => (
+            <AboutCard key={card.title} {...card} />
+          ))}
+        </Box>
 
-          <div className="space-y-6">
-            <div className="bg-slate-900/50 backdrop-blur-sm border border-fuchsia-500/20 rounded-lg p-6 transform hover:scale-105 transition-all duration-500 transform-3d hover:transform-[rotateX(5deg)]">
-              <div className="flex items-center space-x-3 mb-4">
-                <Rocket className="w-8 h-8 text-fuchsia-400" />
-                <h3 className="text-xl font-semibold text-white">My Mission</h3>
-              </div>
-              <p className="text-gray-300 leading-relaxed">
-                To create digital solutions that not only function flawlessly
-                but also inspire and delight users. I believe in the power of
-                technology to solve real-world problems and improve lives.
-              </p>
-            </div>
-
-            <div className="bg-slate-900/50 backdrop-blur-sm border border-cyan-400/20 rounded-lg p-6 transform hover:scale-105 transition-all duration-500 transform-3d hover:transform-[rotateX(-5deg)]">
-              <div className="flex items-center space-x-3 mb-4">
-                <Heart className="w-8 h-8 text-cyan-400" />
-                <h3 className="text-xl font-semibold text-white">
-                  Beyond Code
-                </h3>
-              </div>
-              <p className="text-gray-300 leading-relaxed">
-                When I&apos;m not coding, you&apos;ll find me exploring new
-                technologies, contributing to open-source projects, or sharing
-                knowledge with the developer community. I believe in continuous
-                learning and giving back.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-12 text-center">
-          <Interactive3D />
-          <div className="bg-slate-900/30 backdrop-blur-sm border border-cyan-400/10 rounded-lg p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-white mb-4">
-              Let&apos;s Build Something Amazing Together
-            </h3>
-            <p className="text-gray-300 text-lg leading-relaxed">
-              I&apos;m always excited to take on new challenges and collaborate
-              on innovative projects. Whether it&apos;s a cutting-edge web
-              application, a mobile app, or exploring new technologies, I&apos;m
-              ready to bring your vision to life.
-            </p>
-          </div>
-        </div>
+        {/* ── CTA banner ── */}
+        <Box
+          variants={headingVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: false, amount: 0.4 }}
+          className="mt-16 rounded-3xl p-10 text-center relative overflow-hidden"
+          style={{
+            background: "rgba(122,178,178,0.04)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1px solid rgba(8,131,149,0.14)",
+          }}
+        >
+          {/* Shine line top */}
+          <div
+            aria-hidden="true"
+            className="absolute top-0 left-1/4 right-1/4 h-px"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, rgba(122,178,178,0.5), transparent)",
+            }}
+          />
+          <h3 className="text-2xl md:text-3xl font-black text-white mb-4">
+            Let&apos;s Build Something{" "}
+            <span className="bg-gradient-to-r from-[#088395] to-[#7AB2B2] bg-clip-text text-transparent">
+              Amazing
+            </span>{" "}
+            Together
+          </h3>
+          <p className="text-[#7AB2B2]/80 text-base leading-relaxed max-w-2xl mx-auto">
+            I&apos;m always excited to take on new challenges and collaborate on
+            innovative projects. Whether it&apos;s a cutting-edge web
+            application, a mobile app, or exploring new technologies — I&apos;m
+            ready to bring your vision to life.
+          </p>
+        </Box>
       </div>
-    </section>
+    </Section>
   );
 }

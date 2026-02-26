@@ -10,7 +10,7 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-950 text-white font-sans relative">
+    <div className="min-h-screen font-sans relative">
       <Navbar />
       <Hero />
       <About />

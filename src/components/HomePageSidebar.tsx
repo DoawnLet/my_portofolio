@@ -20,24 +20,24 @@ interface MenuItemType {
   url?: string;
 }
 
+const menuItems: MenuItemType[] = [
+  { id: "hero", label: "Home", icon: Home },
+  { id: "about", label: "About", icon: User },
+  { id: "techstack", label: "Tech Stack", icon: Code2 },
+  { id: "projects", label: "Projects", icon: FolderGit2 },
+  { id: "contact", label: "Contact", icon: Mail },
+  {
+    id: "github",
+    label: "GitHub",
+    icon: Github,
+    isExternal: true,
+    url: "https://github.com/DoawnLet",
+  },
+];
+
 export default function HomePageSidebar() {
   const [isExpanded, setIsExpanded] = useState(true);
   const [activeSection, setActiveSection] = useState("");
-
-  const menuItems: MenuItemType[] = [
-    { id: "hero", label: "Home", icon: Home },
-    { id: "about", label: "About", icon: User },
-    { id: "techstack", label: "Tech Stack", icon: Code2 },
-    { id: "projects", label: "Projects", icon: FolderGit2 },
-    { id: "contact", label: "Contact", icon: Mail },
-    {
-      id: "github",
-      label: "GitHub",
-      icon: Github,
-      isExternal: true,
-      url: "https://github.com/DoawnLet",
-    },
-  ];
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -48,7 +48,7 @@ export default function HomePageSidebar() {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.3 },
     );
 
     menuItems.forEach((item) => {
@@ -72,7 +72,7 @@ export default function HomePageSidebar() {
 
   return (
     <aside
-      className={`hidden md:block fixed top-1/2 -translate-y-1/2 left-0 bg-white/10 backdrop-blur-md shadow-2xl border-r border-cyan-400/30 z-50 transition-all duration-300 ease-in-out rounded-r-2xl ${
+      className={`hidden md:block fixed top-1/2 -translate-y-1/2 left-0 bg-white/10 backdrop-blur-md shadow-2xl border-r border-[#088395]/30 z-50 transition-all duration-300 ease-in-out rounded-r-2xl ${
         isExpanded ? "w-64" : "w-20"
       }`}
     >
@@ -85,9 +85,9 @@ export default function HomePageSidebar() {
             aria-label="Toggle sidebar"
           >
             {isExpanded ? (
-              <ChevronLeft className="w-5 h-5 text-cyan-400" />
+              <ChevronLeft className="w-5 h-5 text-[#088395]" />
             ) : (
-              <ChevronRight className="w-5 h-5 text-cyan-400" />
+              <ChevronRight className="w-5 h-5 text-[#088395]" />
             )}
           </button>
         </div>
@@ -107,16 +107,16 @@ export default function HomePageSidebar() {
                     isExpanded ? "px-4 space-x-3" : "px-0 justify-center"
                   } py-3 rounded-lg transition-all duration-200 relative ${
                     activeSection === item.id
-                      ? "bg-cyan-500/20 border border-cyan-400/50 text-cyan-300"
-                      : "text-gray-300 hover:bg-white/10 hover:text-cyan-400"
+                      ? "bg-[#088395]/20 border border-[#088395]/50 text-[#7AB2B2]"
+                      : "text-gray-300 hover:bg-white/10 hover:text-[#088395]"
                   }`}
                   title={!isExpanded ? item.label : undefined}
                 >
                   <Icon
                     className={`w-5 h-5 shrink-0 ${
                       activeSection === item.id
-                        ? "text-cyan-400"
-                        : "text-gray-400 group-hover:text-cyan-400"
+                        ? "text-[#088395]"
+                        : "text-gray-400 group-hover:text-[#088395]"
                     }`}
                   />
                   {isExpanded && (

@@ -1,0 +1,126 @@
+/* =====================================================
+   About.module.css
+   ===================================================== */
+
+.section {
+  padding-block: var(--section-py);
+  padding-inline: var(--section-px);
+  position: relative;
+  z-index: 10;
+}
+
+.inner {
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.headerIcon {
+  padding: 0.75rem;
+  background: var(--gradient-brand);
+  border-radius: var(--radius-lg);
+}
+
+.headerTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.grid {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+  }
+}
+
+.card {
+  background: rgba(9, 99, 126, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-secondary-20);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform var(--transition-slow),
+    box-shadow var(--transition-slow);
+}
+
+.card:hover {
+  transform: scale(1.04) rotateY(5deg);
+  box-shadow: var(--shadow-brand);
+}
+
+.cardGlow {
+  position: absolute;
+  inset: 0;
+  background: var(--gradient-brand-br);
+  pointer-events: none;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.cardText {
+  color: var(--color-accent);
+  line-height: 1.75;
+  position: relative;
+  z-index: 1;
+}
+
+.cta {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.ctaBox {
+  background: rgba(9, 99, 126, 0.15);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--color-primary-10);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+.ctaTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 1rem;
+}
+
+.ctaText {
+  color: var(--color-accent);
+  font-size: 1.1rem;
+  line-height: 1.75;
+}

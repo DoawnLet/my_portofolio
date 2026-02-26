@@ -3,17 +3,20 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HomePageSidebar from "@/components/HomePageSidebar";
-import ThreeBackground from "@/components/ThreeBackground";
 import CustomCursor from "@/components/CustomCursor";
+import Scene from "@/components/Scene";
+import CookieConsent from "@/components/CookieConsent";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  adjustFontFallback: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  adjustFontFallback: false,
 });
 
 export default function RootLayout({
@@ -26,9 +29,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThreeBackground />
+        <Scene />
         <CustomCursor />
         <HomePageSidebar />
+        <CookieConsent />
         {children}
       </body>
     </html>
