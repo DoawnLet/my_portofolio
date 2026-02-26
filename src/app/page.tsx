@@ -10,14 +10,18 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 export default function Home() {
   return (
-    <div className="min-h-screen font-sans relative">
-      <Navbar />
-      <Hero />
-      <About />
-      <TechStack />
-      <Projects />
-      <Contact />
-      <Footer />
+    <div className="min-h-screen relative text-white font-sans selection:bg-cyan-500/30">
+      <div className="relative z-10 w-full">
+        <Navbar />
+        <main className="w-full">
+          <Hero />
+          <About />
+          <TechStack />
+          <Projects />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }
