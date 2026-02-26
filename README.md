@@ -1,17 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Personal Portfolio
 
-## Getting Started
+My personal portfolio website built with Next.js, React, and Framer Motion.
 
-First, run the development server:
+🔗 **Live Demo:** [minmin-portofolio.vercel.app](https://minmin-portofolio.vercel.app)
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Styling:** Tailwind CSS
+- **Animations:** Framer Motion & Three.js (R3F)
+- **Icons:** Lucide React
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
