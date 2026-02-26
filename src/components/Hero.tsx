@@ -37,11 +37,10 @@ function Blob({
 }: BlobProps) {
   return (
     <Box
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       style={{
-        y: yValue as any,
-        x: xValue as any,
-        scale: scaleValue as any,
+        y: yValue,
+        x: xValue,
+        scale: scaleValue,
         background,
       }}
       className={`absolute rounded-full pointer-events-none will-change-transform ${className ?? ""}`}
