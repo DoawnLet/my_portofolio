@@ -18,9 +18,43 @@ interface FormattedRepo {
   updatedAt: string;
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// Helper to get a high-quality symbolic image based on tech stack
+const getSymbolicImage = (repo: FormattedRepo) => {
+  const tech = (repo.language || repo.topics?.[0] || "coding").toLowerCase();
+
+  const techImages: Record<string, string> = {
+    typescript:
+      "https://images.unsplash.com/photo-1516116216624-53e697fedbea?q=80&w=800&auto=format&fit=crop",
+    javascript:
+      "https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?q=80&w=800&auto=format&fit=crop",
+    python:
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=800&auto=format&fit=crop",
+    java: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=800&auto=format&fit=crop",
+    "c#": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=800&auto=format&fit=crop",
+    react:
+      "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800&auto=format&fit=crop",
+    nextjs:
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?q=80&w=800&auto=format&fit=crop",
+    threejs:
+      "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=800&auto=format&fit=crop",
+    web: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop",
+    mobile:
+      "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?q=80&w=800&auto=format&fit=crop",
+    game: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=800&auto=format&fit=crop",
+    server:
+      "https://images.unsplash.com/photo-1558494949-ef010cbdcc48?q=80&w=800&auto=format&fit=crop",
+    database:
+      "https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=800&auto=format&fit=crop",
+    ai: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop",
+  };
+
+  const match = Object.keys(techImages).find((key) => tech.includes(key));
+  if (match) return techImages[match];
+
+  return `https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=800&auto=format&fit=crop`;
+};
+
 const Box = motion.div as React.FC<any>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 const containerVariants = {
   hidden: {},
@@ -181,7 +215,7 @@ export default function Projects() {
                         title: repo.name.replace(/_/g, " ").replace(/-/g, " "),
                         subtitle: repo.language || "Project",
                         description: repo.description,
-                        image: `https://opengraph.githubassets.com/1/DoawnLet/${repo.name}`,
+                        image: getSymbolicImage(repo),
                         tags: repo.topics?.length
                           ? repo.topics.slice(0, 3)
                           : [repo.language || "GitHub"],
