@@ -14,9 +14,7 @@ import {
 } from "lucide-react";
 import SectionHeader from "@/components/SectionHeader";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const Box = motion.div as React.FC<any>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // ─── Tech data ────────────────────────────────────────────────────────────────
 interface Tech {

@@ -13,7 +13,6 @@ import {
 import { ArrowDown } from "lucide-react";
 
 // Workaround: framer-motion-3d causes generic type conflict with motion.div
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const Box = motion.div as React.FC<any>;
 const Btn = motion.button as React.FC<any>;
 const H1 = motion.h1 as React.FC<any>;

@@ -4,10 +4,8 @@ import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { User, Code2, Rocket, Heart } from "lucide-react";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 const Box = motion.div as React.FC<any>;
 const Section = motion.section as React.FC<any>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // ─── Animation variants ───────────────────────────────────────────────────────
 const containerVariants = {
