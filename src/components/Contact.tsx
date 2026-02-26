@@ -69,8 +69,8 @@ export default function Contact() {
       <div className="max-w-7xl mx-auto">
         <SectionHeader
           eyebrow="Contact"
-          title="TRAVAILLONS"
-          highlight="ENSEMBLE"
+          title="LET'S WORK"
+          highlight="TOGETHER"
           subtitle="Have a project in mind? Drop me a message and let's create something remarkable."
         />
 
@@ -111,7 +111,9 @@ export default function Contact() {
             {/* Social links */}
             <div className="flex gap-3">
               <a
-                href="#"
+                href="https://github.com/DoawnLet"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="GitHub"
                 className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-slate-900/40 border border-white/5 hover:border-[#088395]/40 hover:text-[#088395] text-gray-400 transition-all duration-300"
               >

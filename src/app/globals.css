@@ -26,6 +26,13 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* ── Hide system cursor globally so custom cursor is never covered ── */
+*,
+*::before,
+*::after {
+  cursor: none !important;
+}
+
 @keyframes float {
   0%,
   100% {

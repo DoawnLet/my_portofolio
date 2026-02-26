@@ -45,7 +45,9 @@ export default function Footer() {
             {/* Social icons */}
             <div className="flex gap-3 pt-1">
               <a
-                href="#"
+                href="https://github.com/DoawnLet"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="GitHub"
                 className="p-2.5 rounded-lg bg-slate-800/60 border border-white/5 text-gray-400 hover:text-white hover:border-[#088395]/40 transition-all duration-300"
               >
@@ -119,8 +121,8 @@ export default function Footer() {
           </p>
           <p className="text-xs text-gray-700">
             Designed &amp; built with{" "}
-            <span className="text-[#7AB2B2]/60">♥</span> using Next.js &amp;
-            Tailwind CSS Tailwind CSS
+            <span className="text-[#7AB2B2]/60">♥</span> using Next.js &amp;{" "}
+            Tailwind CSS
           </p>
         </div>
       </div>

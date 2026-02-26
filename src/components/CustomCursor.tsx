@@ -1,109 +1,114 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
 
+  // Use refs for mouse position to avoid re-renders on every mousemove
+  const mouse = useRef({ x: 0, y: 0 });
+  const ring = useRef({ x: 0, y: 0 });
+  const rafId = useRef<number>(0);
+
   useEffect(() => {
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+    // Animate the ring with lerp for smooth trailing
+    const animate = () => {
+      ring.current.x += (mouse.current.x - ring.current.x) * 0.14;
+      ring.current.y += (mouse.current.y - ring.current.y) * 0.14;
+
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate(${mouse.current.x - 4}px, ${mouse.current.y - 4}px)`;
+      }
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate(${ring.current.x - 20}px, ${ring.current.y - 20}px)`;
+      }
+
+      rafId.current = requestAnimationFrame(animate);
+    };
+    rafId.current = requestAnimationFrame(animate);
+
+    const onMouseMove = (e: MouseEvent) => {
+      mouse.current = { x: e.clientX, y: e.clientY };
     };
 
-    const handleMouseDown = () => setIsClicking(true);
-    const handleMouseUp = () => setIsClicking(false);
+    const onMouseDown = () => setIsClicking(true);
+    const onMouseUp = () => setIsClicking(false);
 
-    // Add event listeners
-    document.addEventListener("mousemove", updateMousePosition);
-    document.addEventListener("mousedown", handleMouseDown);
-    document.addEventListener("mouseup", handleMouseUp);
-
-    // Hide default cursor
-    document.body.style.cursor = "none";
-
-    // Add hover effects for interactive elements with a slight delay to ensure DOM is ready
-    const addInteractiveListeners = () => {
-      const interactiveElements = document.querySelectorAll(
-        'a, button, [role="button"], input, textarea, select, [onclick], [onmouseover], .cursor-pointer, nav a, nav button, header a, header button',
-      );
-
-      const handleMouseEnter = () => setIsHovering(true);
-      const handleMouseLeave = () => setIsHovering(false);
-
-      interactiveElements.forEach((element) => {
-        element.addEventListener("mouseenter", handleMouseEnter);
-        element.addEventListener("mouseleave", handleMouseLeave);
-      });
-
-      // Store cleanup function
-      return () => {
-        interactiveElements.forEach((element) => {
-          element.removeEventListener("mouseenter", handleMouseEnter);
-          element.removeEventListener("mouseleave", handleMouseLeave);
-        });
-      };
+    // Detect hover on any interactive element via event delegation
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.closest(
+          "a, button, [role='button'], input, textarea, select, label",
+        )
+      ) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
     };
 
-    // Add listeners immediately and after a short delay for dynamically loaded content
-    const cleanup1 = addInteractiveListeners();
-    const timeoutId = setTimeout(() => {
-      const cleanup2 = addInteractiveListeners();
-      // Store the second cleanup for later use
-      return cleanup2;
-    }, 100);
+    document.addEventListener("mousemove", onMouseMove, { passive: true });
+    document.addEventListener("mouseover", onMouseOver, { passive: true });
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mouseup", onMouseUp);
 
     return () => {
-      document.removeEventListener("mousemove", updateMousePosition);
-      document.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mouseup", handleMouseUp);
-      clearTimeout(timeoutId);
-
-      // Clean up both sets of listeners
-      cleanup1();
-      // The second cleanup would be handled by the timeout, but we need to ensure it's called
+      cancelAnimationFrame(rafId.current);
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseover", onMouseOver);
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mouseup", onMouseUp);
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-9999">
-      {/* Main cursor dot */}
+    <div
+      className="fixed inset-0 pointer-events-none z-[9999]"
+      aria-hidden="true"
+    >
+      {/* ── Dot — snaps instantly to cursor ── */}
       <div
-        className={`absolute top-0 left-0 w-2 h-2 bg-[#088395] rounded-full transition-all duration-100 ease-out ${
-          isHovering ? "scale-150 bg-[#09637E]" : ""
-        } ${isClicking ? "scale-75" : ""}`}
-        style={{
-          transform: `translate(${mousePosition.x - 4}px, ${
-            mousePosition.y - 4
-          }px)`,
-        }}
-      />
+        ref={dotRef}
+        className="absolute top-0 left-0 will-change-transform"
+        style={{ willChange: "transform" }}
+      >
+        <div
+          className={`w-2 h-2 rounded-full transition-transform duration-100 ${
+            isClicking ? "scale-50" : isHovering ? "scale-[2]" : "scale-100"
+          }`}
+          style={{
+            background: isHovering ? "#EBF4F6" : "#088395",
+            boxShadow: isHovering
+              ? "0 0 8px rgba(235,244,246,0.8)"
+              : "0 0 6px rgba(8,131,149,0.7)",
+          }}
+        />
+      </div>
 
-      {/* Cursor ring */}
+      {/* ── Ring — lags behind (lerp) for trailing feel ── */}
       <div
-        className={`absolute top-0 left-0 w-8 h-8 border-2 border-[#088395] rounded-full transition-all duration-300 ease-out ${
-          isHovering ? "w-12 h-12 border-[#09637E] scale-110" : ""
-        } ${isClicking ? "scale-90 border-[#7AB2B2]" : ""}`}
-        style={{
-          transform: `translate(${mousePosition.x - 16}px, ${
-            mousePosition.y - 16
-          }px)`,
-        }}
-      />
-
-      {/* Cursor trail effect */}
-      <div
-        className={`absolute top-0 left-0 w-1 h-1 bg-[#7AB2B2] rounded-full opacity-60 transition-all duration-500 ease-out ${
-          isHovering ? "opacity-80" : ""
-        }`}
-        style={{
-          transform: `translate(${mousePosition.x - 2}px, ${
-            mousePosition.y - 2
-          }px)`,
-          animation: "cursorTrail 0.5s ease-out infinite",
-        }}
-      />
+        ref={ringRef}
+        className="absolute top-0 left-0 will-change-transform"
+      >
+        <div
+          className={`rounded-full border-2 transition-all duration-200 ${
+            isClicking
+              ? "w-8 h-8 border-[#7AB2B2] opacity-60"
+              : isHovering
+                ? "w-10 h-10 border-[#EBF4F6] opacity-80"
+                : "w-10 h-10 border-[#088395] opacity-60"
+          }`}
+          style={{
+            boxShadow: isHovering
+              ? "0 0 14px rgba(122,178,178,0.45), inset 0 0 6px rgba(122,178,178,0.12)"
+              : "0 0 8px rgba(8,131,149,0.3)",
+          }}
+        />
+      </div>
     </div>
   );
 }

@@ -10,52 +10,55 @@ import { motion } from "framer-motion-3d";
 
 function ParticleSwarm() {
   const ref = useRef<THREE.Points>(null);
+  // Manual elapsed time — avoids THREE.Clock deprecation warning
+  const elapsed = useRef(0);
 
   // Track scroll position of the entire window
   const { scrollYProgress } = useScroll();
 
-  // Smooth the scroll progress so the particles don't abruptly stop when scrolling stops
+  // Smooth the scroll progress for fluid particle movement
   const smoothProgress = useSpring(scrollYProgress, {
-    damping: 20,
-    stiffness: 100,
-    mass: 0.5,
+    damping: 15,
+    stiffness: 80,
+    mass: 0.8,
   });
 
-  // Map scroll progress (0 to 1) to rotation values
-  const rotationY = useTransform(smoothProgress, [0, 1], [0, Math.PI * 4]);
-  const rotationX = useTransform(smoothProgress, [0, 1], [0, Math.PI * 2]);
+  // Map scroll progress (0→1) to larger rotation values for visible parallax
+  const rotationY = useTransform(smoothProgress, [0, 1], [0, Math.PI * 8]);
+  const rotationX = useTransform(smoothProgress, [0, 1], [0, Math.PI * 4]);
 
   // Create random points in a sphere
   const [positions, speeds] = useMemo(() => {
-    const count = 5000;
+    const count = 1800;
     const positions = new Float32Array(count * 3);
     const speeds = new Float32Array(count);
 
     for (let i = 0; i < count; i++) {
-      // Create a slightly more clustered galaxy-like distribution
-      const r = 2 + Math.pow(Math.random(), 3) * 20;
+      // Spread particles further from center — avoids center clustering
+      const r = 5 + Math.pow(Math.random(), 2.2) * 22;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(Math.random() * 2 - 1);
 
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta); // x
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta); // y
-      positions[i * 3 + 2] = r * Math.cos(phi); // z
+      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
 
-      speeds[i] = Math.random() * 0.5 + 0.1;
+      speeds[i] = Math.random() * 0.4 + 0.08;
     }
 
     return [positions, speeds];
   }, []);
 
-  useFrame((state) => {
+  useFrame((_state, delta) => {
     if (!ref.current) return;
 
-    // Subtle continuous wavy animation independent of scroll
-    const time = state.clock.elapsedTime;
+    elapsed.current += delta;
+    const time = elapsed.current;
+
     const array = ref.current.geometry.attributes.position
       .array as Float32Array;
 
-    for (let i = 0; i < 5000; i++) {
+    for (let i = 0; i < 1800; i++) {
       const i3 = i * 3;
       array[i3 + 1] += Math.sin(time * speeds[i] + array[i3]) * 0.005;
     }
@@ -68,10 +71,11 @@ function ParticleSwarm() {
       <Points ref={ref} positions={positions}>
         <PointMaterial
           transparent
-          color="#088395" // teal primary
-          size={0.15}
+          color="#088395"
+          size={0.055}
           sizeAttenuation={true}
           depthWrite={false}
+          opacity={0.75}
           blending={THREE.AdditiveBlending}
         />
       </Points>

@@ -20,17 +20,30 @@ const H1 = motion.h1 as React.FC<any>;
 const Para = motion.p as React.FC<any>;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-// ─── Floating background blob ────────────────────────────────────────────────
+// ─── Floating background blob with X+Y parallax ──────────────────────────────
 interface BlobProps {
   yValue: MotionValue<number>;
+  xValue?: MotionValue<number>;
+  scaleValue?: MotionValue<number>;
   background: string;
   className?: string;
 }
-function Blob({ yValue, background, className }: BlobProps) {
+function Blob({
+  yValue,
+  xValue,
+  scaleValue,
+  background,
+  className,
+}: BlobProps) {
   return (
     <Box
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      style={{ y: yValue as any, background }}
+      style={{
+        y: yValue as any,
+        x: xValue as any,
+        scale: scaleValue as any,
+        background,
+      }}
       className={`absolute rounded-full pointer-events-none will-change-transform ${className ?? ""}`}
     />
   );
@@ -95,24 +108,53 @@ const itemVariants = {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  // Cast to satisfy framer-motion v11 strict ref type
   const inView = useInView(sectionRef as unknown as React.RefObject<Element>, {
     once: true,
     margin: "-80px",
   });
 
-  // Scroll-driven parallax
+  // Scroll-driven parallax — use scrollYProgress for all transforms
   const { scrollY } = useScroll();
+  const SCROLL_RANGE = 900; // viewport height approx
 
-  // Different parallax speeds for depth layering
-  const blobY1 = useTransform(scrollY, [0, 600], [0, -180]);
-  const blobY2 = useTransform(scrollY, [0, 600], [0, -90]);
-  const blobY3 = useTransform(scrollY, [0, 600], [0, -240]);
-  const blobY4 = useTransform(scrollY, [0, 600], [0, -60]);
+  // ── BLOB LAYER 1: Huge teal blob top-left — drifts slowly left & up ────────
+  const blob1Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -320]);
+  const blob1X = useTransform(scrollY, [0, SCROLL_RANGE], [0, -80]);
+  const blob1Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 1.4]);
 
-  // Content moves up slightly faster than neutral = depth effect
-  const contentY = useTransform(scrollY, [0, 600], [0, -90]);
-  const contentOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  // ── BLOB LAYER 2: Mid teal blob top-right — medium speed, drifts right ─────
+  const blob2Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -200]);
+  const blob2X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 60]);
+  const blob2Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 0.7]);
+
+  // ── BLOB LAYER 3: Light blob center-top — fastest, shoots upward ──────────
+  const blob3Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -480]);
+  const blob3X = useTransform(scrollY, [0, SCROLL_RANGE], [0, -40]);
+
+  // ── BLOB LAYER 4: Deep accent blob bottom-right — slow, drifts down ────────
+  const blob4Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -120]);
+  const blob4X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 100]);
+  const blob4Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 1.6]);
+
+  // ── BLOB LAYER 5: Extra small accent — diagonal drift ─────────────────────
+  const blob5Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -380]);
+  const blob5X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 120]);
+
+  // ── Content: moves up faster = strong depth separation ────────────────────
+  const contentY = useTransform(scrollY, [0, SCROLL_RANGE], [0, -180]);
+  const contentOpacity = useTransform(
+    scrollY,
+    [0, SCROLL_RANGE * 0.45],
+    [1, 0],
+  );
+  const contentScale = useTransform(
+    scrollY,
+    [0, SCROLL_RANGE * 0.5],
+    [1, 0.92],
+  );
+
+  // ── Dot-grid texture moves independently (slowest layer) ──────────────────
+  const gridY = useTransform(scrollY, [0, SCROLL_RANGE], [0, -60]);
 
   return (
     <section
@@ -120,46 +162,64 @@ export default function Hero() {
       ref={sectionRef}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* ── Parallax background blobs ── */}
-      {/* Layer 1 — largest, slowest */}
+      {/* ── Parallax Layer 1: Huge teal blob — top-left, drifts up-left ── */}
       <Blob
-        yValue={blobY4}
-        background="radial-gradient(circle, #7AB2B2, transparent 70%)"
-        className="w-[700px] h-[700px] -left-64 -top-40 opacity-20 blur-[80px]"
-      />
-      {/* Layer 2 — medium-fast */}
-      <Blob
-        yValue={blobY2}
-        background="radial-gradient(circle, #088395, transparent 70%)"
-        className="w-[500px] h-[500px] right-0 top-20 opacity-15 blur-[60px]"
-      />
-      {/* Layer 3 — fastest, top */}
-      <Blob
-        yValue={blobY3}
-        background="radial-gradient(circle, #EBF4F6, transparent 70%)"
-        className="w-[360px] h-[360px] left-1/4 top-10 opacity-10 blur-[48px]"
-      />
-      {/* Layer 4 — bottom accent */}
-      <Blob
-        yValue={blobY1}
-        background="radial-gradient(circle, #09637E, transparent 70%)"
-        className="w-[480px] h-[480px] right-10 bottom-0 opacity-12 blur-[72px]"
+        yValue={blob1Y}
+        xValue={blob1X}
+        scaleValue={blob1Scale}
+        background="radial-gradient(circle, #7AB2B2, transparent 65%)"
+        className="w-[800px] h-[800px] -left-80 -top-60 opacity-25 blur-[90px]"
       />
 
-      {/* Fine dot-grid texture overlay */}
-      <div
+      {/* ── Parallax Layer 2: Teal mid-blob — top-right, medium speed ── */}
+      <Blob
+        yValue={blob2Y}
+        xValue={blob2X}
+        scaleValue={blob2Scale}
+        background="radial-gradient(circle, #088395, transparent 65%)"
+        className="w-[600px] h-[600px] -right-20 top-10 opacity-30 blur-[70px]"
+      />
+
+      {/* ── Parallax Layer 3: Light accent — center, fastest ── */}
+      <Blob
+        yValue={blob3Y}
+        xValue={blob3X}
+        background="radial-gradient(circle, #EBF4F6, transparent 65%)"
+        className="w-[380px] h-[380px] left-1/3 top-16 opacity-15 blur-[50px]"
+      />
+
+      {/* ── Parallax Layer 4: Deep accent — bottom-right, slow + grow ── */}
+      <Blob
+        yValue={blob4Y}
+        xValue={blob4X}
+        scaleValue={blob4Scale}
+        background="radial-gradient(circle, #09637E, transparent 65%)"
+        className="w-[520px] h-[520px] right-24 bottom-0 opacity-20 blur-[80px]"
+      />
+
+      {/* ── Parallax Layer 5: Small accent — diagonal drift ── */}
+      <Blob
+        yValue={blob5Y}
+        xValue={blob5X}
+        background="radial-gradient(circle, #7AB2B2, transparent 60%)"
+        className="w-[280px] h-[280px] left-10 bottom-40 opacity-20 blur-[40px]"
+      />
+
+      {/* ── Dot-grid texture — slowest layer (subtle depth) ── */}
+      <Box
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0"
         style={{
-          backgroundImage: `radial-gradient(circle, rgba(122,178,178,0.18) 1px, transparent 1px)`,
+          y: gridY,
+          backgroundImage: `radial-gradient(circle, rgba(122,178,178,0.22) 1px, transparent 1px)`,
           backgroundSize: "36px 36px",
         }}
+        className="pointer-events-none absolute inset-0 z-0 will-change-transform"
       />
 
-      {/* ── Main content ── */}
+      {/* ── Main content — strongest upward parallax for deep Z separation ── */}
       <Box
-        style={{ y: contentY, opacity: contentOpacity }}
-        className="relative z-10 max-w-5xl mx-auto px-6 text-center"
+        style={{ y: contentY, opacity: contentOpacity, scale: contentScale }}
+        className="relative z-10 max-w-5xl mx-auto px-6 text-center will-change-transform"
       >
         <Box
           variants={containerVariants}
@@ -169,7 +229,7 @@ export default function Hero() {
           {/* Eyebrow label */}
           <Box variants={itemVariants} className="mb-6">
             <span className="inline-block text-xs font-semibold tracking-[0.3em] uppercase text-[#7AB2B2] border border-[#7AB2B2]/30 rounded-full px-5 py-2 bg-[#088395]/10 backdrop-blur-sm">
-              Full-Stack Developer & Creative Technologist
+              Full-Stack Developer &amp; Creative Technologist
             </span>
           </Box>
 
@@ -227,19 +287,19 @@ export default function Hero() {
           Scroll
         </span>
         <Box
-          animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-          className="w-px h-10 bg-gradient-to-b from-[#7AB2B2]/60 to-transparent"
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+          className="w-px h-12 bg-gradient-to-b from-[#7AB2B2]/70 to-transparent"
         />
       </Box>
 
       {/* ── Bottom fade into next section ── */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-0 left-0 right-0 h-40 z-10"
+        className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 z-10"
         style={{
           background:
-            "linear-gradient(to bottom, transparent, rgba(9,99,126,0.15))",
+            "linear-gradient(to bottom, transparent, rgba(2,6,23,0.6))",
         }}
       />
     </section>

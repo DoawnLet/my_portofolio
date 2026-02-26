@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { User, Code2, Rocket, Heart } from "lucide-react";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -152,25 +152,44 @@ function AboutCard({
 
 // ─── About Section ────────────────────────────────────────────────────────────
 export default function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Scroll-driven parallax on the section blobs
+  const { scrollYProgress } = useScroll({
+    target: sectionRef as unknown as React.RefObject<HTMLElement>,
+    offset: ["start end", "end start"],
+  });
+
+  const blobTopY = useTransform(scrollYProgress, [0, 1], [-80, 140]);
+  const blobTopX = useTransform(scrollYProgress, [0, 1], [0, 60]);
+  const blobBotY = useTransform(scrollYProgress, [0, 1], [60, -120]);
+  const blobBotX = useTransform(scrollYProgress, [0, 1], [0, -50]);
+
   return (
     <Section
       id="about"
+      ref={sectionRef}
       className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Background accent blobs */}
-      <div
+      {/* Background accent blob – top-right, drifts diagonally on scroll */}
+      <Box
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full opacity-[0.08] blur-[80px]"
         style={{
+          y: blobTopY,
+          x: blobTopX,
           background: "radial-gradient(circle, #7AB2B2, transparent 70%)",
         }}
+        className="pointer-events-none absolute -top-32 -right-32 w-[560px] h-[560px] rounded-full opacity-[0.12] blur-[80px] will-change-transform"
       />
-      <div
+      {/* Background accent blob – bottom-left, drifts opposite direction */}
+      <Box
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full opacity-[0.07] blur-[64px]"
         style={{
+          y: blobBotY,
+          x: blobBotX,
           background: "radial-gradient(circle, #088395, transparent 70%)",
         }}
+        className="pointer-events-none absolute -bottom-20 -left-20 w-[440px] h-[440px] rounded-full opacity-[0.11] blur-[64px] will-change-transform"
       />
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -179,7 +198,7 @@ export default function About() {
           variants={headingVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           className="text-center mb-16"
         >
           <span
@@ -207,7 +226,7 @@ export default function About() {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.2 }}
           className="grid sm:grid-cols-2 gap-5"
         >
           {cards.map((card) => (
@@ -220,7 +239,7 @@ export default function About() {
           variants={headingVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.4 }}
+          viewport={{ once: true, amount: 0.4 }}
           className="mt-16 rounded-3xl p-10 text-center relative overflow-hidden"
           style={{
             background: "rgba(122,178,178,0.04)",
