@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, Suspense } from "react";
 import {
   motion,
   useScroll,
@@ -8,42 +8,225 @@ import {
   useMotionValue,
   useSpring,
   useInView,
-  type MotionValue,
 } from "framer-motion";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment, Float, MeshDistortMaterial } from "@react-three/drei";
+import { motion as motion3d } from "framer-motion-3d";
+import { Physics, useSphere, usePlane } from "@react-three/cannon";
 import { ArrowDown } from "lucide-react";
 
-// Workaround: framer-motion-3d causes generic type conflict with motion.div
+// Workaround for generic type conflicts
 const Box = motion.div as React.FC<any>;
 const Btn = motion.button as React.FC<any>;
 const H1 = motion.h1 as React.FC<any>;
 const Para = motion.p as React.FC<any>;
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
-// ─── Floating background blob with X+Y parallax ──────────────────────────────
-interface BlobProps {
-  yValue: MotionValue<number>;
-  xValue?: MotionValue<number>;
-  scaleValue?: MotionValue<number>;
-  background: string;
-  className?: string;
+// ─── Boundaries ──────────────────────────────────────────────────────────────
+function InvisibleWalls() {
+  // Floor
+  usePlane(() => ({ position: [0, -5, 0], rotation: [-Math.PI / 2, 0, 0] }));
+  // Ceiling
+  usePlane(() => ({ position: [0, 5, 0], rotation: [Math.PI / 2, 0, 0] }));
+  // Left wall
+  usePlane(() => ({ position: [-8, 0, 0], rotation: [0, Math.PI / 2, 0] }));
+  // Right wall
+  usePlane(() => ({ position: [8, 0, 0], rotation: [0, -Math.PI / 2, 0] }));
+  // Back wall
+  usePlane(() => ({ position: [0, 0, -4], rotation: [0, 0, 0] }));
+  // Front wall
+  usePlane(() => ({ position: [0, 0, 4], rotation: [0, Math.PI, 0] }));
+  return null;
 }
-function Blob({
-  yValue,
-  xValue,
-  scaleValue,
-  background,
-  className,
-}: BlobProps) {
+
+// ─── 3D Shapes ───────────────────────────────────────────────────────────────
+function FloatingShape({
+  position,
+  color,
+  distort,
+  speed,
+  scale = 1,
+}: {
+  position: [number, number, number];
+  color: string;
+  distort: number;
+  speed: number;
+  scale?: number;
+}) {
+  const [hovered, setHovered] = React.useState(false);
+  const [clicked, setClicked] = React.useState(false);
+  const [pinned, setPinned] = React.useState(false);
+
+  // Physics sphere reference
+  const [meshRef, api] = useSphere(() => ({
+    mass: 1,
+    position: position,
+    args: [scale * 1.2], // rough radius for collision
+    linearDamping: 0.1,
+    angularDamping: 0.1,
+    material: { restitution: 0.9, friction: 0.1 }, // bounciness
+  }));
+
+  // Apply initial random velocity to make them float around
+  React.useEffect(() => {
+    // Random direction and rotation
+    const rx = (Math.random() - 0.5) * 5;
+    const ry = (Math.random() - 0.5) * 5;
+    const rz = (Math.random() - 0.5) * 5;
+    api.velocity.set(rx, ry, rz);
+    api.angularVelocity.set(rx, ry, rz);
+  }, [api.velocity, api.angularVelocity]);
+
+  // Hold timer ref
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Self-rotation wiggle effect using frame
+  useFrame((state, delta) => {
+    if (!pinned && !clicked && hovered) {
+      // Just visually spin the shape slightly on hover
+      api.angularVelocity.set(0, 2, 0);
+    }
+  });
+
+  const handlePointerDown = () => {
+    setClicked(true);
+    // Stop physics forces immediately
+    api.velocity.set(0, 0, 0);
+    api.angularVelocity.set(0, 0, 0);
+
+    // Start 5-second timer
+    timerRef.current = setTimeout(() => {
+      setPinned(true);
+      // Make it kinematic/static so it stays pinned and bouncy
+      api.mass.set(0);
+    }, 5000);
+  };
+
+  const handlePointerUp = () => {
+    setClicked(false);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    // If not pinned, throw it back into space
+    if (!pinned) {
+      const pushX = (Math.random() - 0.5) * 8;
+      const pushY = (Math.random() - 0.5) * 8;
+      const pushZ = (Math.random() - 0.5) * 8;
+      api.velocity.set(pushX, pushY, pushZ);
+      api.mass.set(1); // Restore mass
+    }
+  };
+
+  const handlePointerOut = () => {
+    setHovered(false);
+    document.body.style.cursor = "auto";
+    if (clicked && !pinned) {
+      // Cancel hold if dragged out
+      handlePointerUp();
+    }
+  };
+
+  // Calculate target scale based on interaction state
+  const currentScale = pinned
+    ? scale * 1.5
+    : clicked
+      ? scale * 0.7
+      : hovered
+        ? scale * 1.3
+        : scale;
+
   return (
-    <Box
-      style={{
-        y: yValue,
-        x: xValue,
-        scale: scaleValue,
-        background,
-      }}
-      className={`absolute rounded-full pointer-events-none will-change-transform ${className ?? ""}`}
-    />
+    <Float
+      speed={pinned ? 0 : speed}
+      rotationIntensity={pinned ? 0 : 0.5}
+      floatIntensity={pinned ? 0 : 0.5}
+    >
+      <motion3d.mesh
+        ref={meshRef as React.Ref<any>}
+        animate={{ scale: currentScale }}
+        transition={{ type: "spring", stiffness: 300, damping: 15 }}
+        onPointerOver={() => {
+          setHovered(true);
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={handlePointerOut}
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+      >
+        <icosahedronGeometry args={[1, 0]} />
+        <MeshDistortMaterial
+          color={pinned ? "#ffffff" : color} // Turns white when pinned
+          envMapIntensity={1}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          metalness={pinned ? 0.9 : 0.5}
+          roughness={0.2}
+          transmission={0.9}
+          ior={1.5}
+          thickness={0.5}
+          distort={hovered || pinned ? distort * 2 : distort}
+          speed={hovered && !pinned ? speed * 2 : speed}
+        />
+      </motion3d.mesh>
+    </Float>
+  );
+}
+
+function Scene({ mouseX, mouseY }: { mouseX: any; mouseY: any }) {
+  // Use springs for smooth mouse follow
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 20 });
+
+  // Convert 2D mouse position to slight 3D rotation
+  const groupRotationY = useTransform(springX, [-0.5, 0.5], [-0.08, 0.08]);
+  const groupRotationX = useTransform(springY, [-0.5, 0.5], [-0.08, 0.08]);
+
+  return (
+    <motion3d.group rotation-y={groupRotationY} rotation-x={groupRotationX}>
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1} color="#ffffff" />
+      <directionalLight
+        position={[-10, -10, -5]}
+        intensity={0.5}
+        color="#088395"
+      />
+
+      {/* Physics World wrapped around floating shapes */}
+      <Physics gravity={[0, 0, 0]}>
+        <InvisibleWalls />
+        {/* 3D Shapes around the text */}
+        <FloatingShape
+          position={[-3.5, 1.5, -2]}
+          color="#7AB2B2"
+          distort={0.2}
+          speed={1.5}
+          scale={1.2}
+        />
+        <FloatingShape
+          position={[3.5, -1.5, 0]}
+          color="#088395"
+          distort={0.3}
+          speed={2}
+          scale={1.5}
+        />
+        <FloatingShape
+          position={[-2.5, -2, 1]}
+          color="#09637E"
+          distort={0.4}
+          speed={2.5}
+          scale={0.8}
+        />
+        <FloatingShape
+          position={[2.5, 2, -1]}
+          color="#EBF4F6"
+          distort={0.1}
+          speed={1}
+          scale={1}
+        />
+      </Physics>
+
+      <Environment preset="city" />
+    </motion3d.group>
   );
 }
 
@@ -77,16 +260,15 @@ function MagneticButton({ children }: { children: React.ReactNode }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       whileTap={{ scale: 0.96 }}
-      className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-[#088395] to-[#09637E] text-[#EBF4F6] font-semibold text-lg overflow-hidden shadow-[0_8px_32px_rgba(8,131,149,0.35)] hover:shadow-[0_12px_48px_rgba(8,131,149,0.55)] transition-shadow duration-500"
+      className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-2xl bg-gradient-to-r from-[#088395] to-[#09637E] text-[#EBF4F6] font-semibold text-lg overflow-hidden shadow-[0_8px_32px_rgba(8,131,149,0.35)] hover:shadow-[0_12px_48px_rgba(8,131,149,0.55)] transition-shadow duration-500 pointer-events-auto"
     >
-      {/* shine sweep */}
       <span className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 bg-gradient-to-r from-transparent via-white/15 to-transparent skew-x-12" />
       {children}
     </Btn>
   );
 }
 
-// ─── Stagger container variants ───────────────────────────────────────────────
+// ─── Stagger container variants ──────────
 const containerVariants = {
   hidden: {},
   visible: {
@@ -111,34 +293,10 @@ export default function Hero() {
     margin: "-80px",
   });
 
-  // Scroll-driven parallax — use scrollYProgress for all transforms
   const { scrollY } = useScroll();
-  const SCROLL_RANGE = 900; // viewport height approx
+  const SCROLL_RANGE = 900;
 
-  // ── BLOB LAYER 1: Huge teal blob top-left — drifts slowly left & up ────────
-  const blob1Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -320]);
-  const blob1X = useTransform(scrollY, [0, SCROLL_RANGE], [0, -80]);
-  const blob1Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 1.4]);
-
-  // ── BLOB LAYER 2: Mid teal blob top-right — medium speed, drifts right ─────
-  const blob2Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -200]);
-  const blob2X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 60]);
-  const blob2Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 0.7]);
-
-  // ── BLOB LAYER 3: Light blob center-top — fastest, shoots upward ──────────
-  const blob3Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -480]);
-  const blob3X = useTransform(scrollY, [0, SCROLL_RANGE], [0, -40]);
-
-  // ── BLOB LAYER 4: Deep accent blob bottom-right — slow, drifts down ────────
-  const blob4Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -120]);
-  const blob4X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 100]);
-  const blob4Scale = useTransform(scrollY, [0, SCROLL_RANGE], [1, 1.6]);
-
-  // ── BLOB LAYER 5: Extra small accent — diagonal drift ─────────────────────
-  const blob5Y = useTransform(scrollY, [0, SCROLL_RANGE], [0, -380]);
-  const blob5X = useTransform(scrollY, [0, SCROLL_RANGE], [0, 120]);
-
-  // ── Content: moves up faster = strong depth separation ────────────────────
+  // Parallax for the whole content
   const contentY = useTransform(scrollY, [0, SCROLL_RANGE], [0, -180]);
   const contentOpacity = useTransform(
     scrollY,
@@ -151,82 +309,58 @@ export default function Hero() {
     [1, 0.92],
   );
 
-  // ── Dot-grid texture moves independently (slowest layer) ──────────────────
-  const gridY = useTransform(scrollY, [0, SCROLL_RANGE], [0, -60]);
+  // Mouse position normalized for 3D group rotation (-0.5 to 0.5)
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove(e: React.MouseEvent<HTMLElement>) {
+    if (typeof window !== "undefined") {
+      mouseX.set(e.clientX / window.innerWidth - 0.5);
+      mouseY.set(e.clientY / window.innerHeight - 0.5);
+    }
+  }
 
   return (
     <section
       id="hero"
       ref={sectionRef}
+      onMouseMove={handleMouseMove}
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* ── Parallax Layer 1: Huge teal blob — top-left, drifts up-left ── */}
-      <Blob
-        yValue={blob1Y}
-        xValue={blob1X}
-        scaleValue={blob1Scale}
-        background="radial-gradient(circle, #7AB2B2, transparent 65%)"
-        className="w-[800px] h-[800px] -left-80 -top-60 opacity-25 blur-[90px]"
-      />
+      {/* ── 3D Canvas Background ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <Canvas camera={{ position: [0, 0, 8], fov: 45 }} dpr={[1, 2]}>
+          <Suspense fallback={null}>
+            <Scene mouseX={mouseX} mouseY={mouseY} />
+          </Suspense>
+        </Canvas>
+      </div>
 
-      {/* ── Parallax Layer 2: Teal mid-blob — top-right, medium speed ── */}
-      <Blob
-        yValue={blob2Y}
-        xValue={blob2X}
-        scaleValue={blob2Scale}
-        background="radial-gradient(circle, #088395, transparent 65%)"
-        className="w-[600px] h-[600px] -right-20 top-10 opacity-30 blur-[70px]"
-      />
-
-      {/* ── Parallax Layer 3: Light accent — center, fastest ── */}
-      <Blob
-        yValue={blob3Y}
-        xValue={blob3X}
-        background="radial-gradient(circle, #EBF4F6, transparent 65%)"
-        className="w-[380px] h-[380px] left-1/3 top-16 opacity-15 blur-[50px]"
-      />
-
-      {/* ── Parallax Layer 4: Deep accent — bottom-right, slow + grow ── */}
-      <Blob
-        yValue={blob4Y}
-        xValue={blob4X}
-        scaleValue={blob4Scale}
-        background="radial-gradient(circle, #09637E, transparent 65%)"
-        className="w-[520px] h-[520px] right-24 bottom-0 opacity-20 blur-[80px]"
-      />
-
-      {/* ── Parallax Layer 5: Small accent — diagonal drift ── */}
-      <Blob
-        yValue={blob5Y}
-        xValue={blob5X}
-        background="radial-gradient(circle, #7AB2B2, transparent 60%)"
-        className="w-[280px] h-[280px] left-10 bottom-40 opacity-20 blur-[40px]"
-      />
-
-      {/* ── Dot-grid texture — slowest layer (subtle depth) ── */}
+      {/* ── Dot-grid texture ── */}
       <Box
         aria-hidden="true"
         style={{
-          y: gridY,
-          backgroundImage: `radial-gradient(circle, rgba(122,178,178,0.22) 1px, transparent 1px)`,
+          y: useTransform(scrollY, [0, SCROLL_RANGE], [0, -60]),
+          backgroundImage: `radial-gradient(circle, rgba(122,178,178,0.15) 1px, transparent 1px)`,
           backgroundSize: "36px 36px",
         }}
         className="pointer-events-none absolute inset-0 z-0 will-change-transform"
       />
 
-      {/* ── Main content — strongest upward parallax for deep Z separation ── */}
+      {/* ── Main content ── */}
       <Box
         style={{ y: contentY, opacity: contentOpacity, scale: contentScale }}
-        className="relative z-10 max-w-5xl mx-auto px-6 text-center will-change-transform"
+        className="relative z-10 max-w-5xl mx-auto px-6 text-center will-change-transform pointer-events-none"
       >
         <Box
           variants={containerVariants}
           initial="hidden"
           animate={inView ? "visible" : "hidden"}
+          className="pointer-events-auto"
         >
           {/* Eyebrow label */}
           <Box variants={itemVariants} className="mb-6">
-            <span className="inline-block text-xs font-semibold tracking-[0.3em] uppercase text-[#7AB2B2] border border-[#7AB2B2]/30 rounded-full px-5 py-2 bg-[#088395]/10 backdrop-blur-sm">
+            <span className="inline-block text-xs font-semibold tracking-[0.3em] uppercase text-[#7AB2B2] border border-[#7AB2B2]/30 rounded-full px-5 py-2 bg-[#088395]/10 backdrop-blur-sm shadow-[0_0_20px_rgba(8,131,149,0.2)]">
               Full-Stack Developer &amp; Creative Technologist
             </span>
           </Box>
@@ -234,7 +368,7 @@ export default function Hero() {
           {/* Headline */}
           <H1
             variants={itemVariants}
-            className="text-6xl md:text-8xl font-black leading-[1.05] tracking-tight mb-6"
+            className="text-6xl md:text-8xl font-black leading-[1.05] tracking-tight mb-6 drop-shadow-2xl"
           >
             <span className="block bg-gradient-to-br from-[#EBF4F6] via-[#7AB2B2] to-[#EBF4F6] bg-clip-text text-transparent">
               Crafting Digital
@@ -247,7 +381,7 @@ export default function Hero() {
           {/* Subtitle */}
           <Para
             variants={itemVariants}
-            className="text-lg md:text-xl text-[#7AB2B2]/90 max-w-2xl mx-auto leading-relaxed mb-12"
+            className="text-lg md:text-xl text-[#7AB2B2]/90 max-w-2xl mx-auto leading-relaxed mb-12 drop-shadow-md"
           >
             Building immersive, pixel-perfect interfaces where clean code meets
             creative vision. Specialising in React, Next.js, and AI-driven
@@ -266,7 +400,7 @@ export default function Hero() {
 
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border border-[#7AB2B2]/30 text-[#7AB2B2] hover:text-[#EBF4F6] hover:border-[#088395]/60 hover:bg-[#088395]/10 transition-all duration-300 font-medium text-base backdrop-blur-sm"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl border border-[#7AB2B2]/30 text-[#7AB2B2] hover:text-[#EBF4F6] hover:border-[#088395]/60 hover:bg-[#088395]/10 transition-all duration-300 font-medium text-base backdrop-blur-sm drop-shadow-lg"
             >
               Get in Touch
             </a>
@@ -279,7 +413,7 @@ export default function Hero() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.8, duration: 0.8 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 pointer-events-none"
       >
         <span className="text-[10px] tracking-[0.3em] uppercase text-[#7AB2B2]/60 font-medium">
           Scroll
@@ -291,7 +425,7 @@ export default function Hero() {
         />
       </Box>
 
-      {/* ── Bottom fade into next section ── */}
+      {/* ── Bottom fade ── */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute bottom-0 left-0 right-0 h-48 z-10"
