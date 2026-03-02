@@ -1,5 +1,4 @@
-"use client";
-
+import type { Metadata } from "next";
 import React from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -8,6 +7,17 @@ import TechStack from "@/components/TechStack";
 import Projects from "@/components/Projects";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+
+export const metadata: Metadata = {
+  title: "DoawnLet | Full-Stack Developer Portfolio",
+  description:
+    "Hi, I'm DoawnLet — a full-stack developer building immersive web experiences with React, Next.js, Three.js, Framer Motion, and ASP.NET Core.",
+  alternates: {
+    canonical:
+      process.env.NEXT_PUBLIC_SITE_URL ?? "https://doawnlet.vercel.app",
+  },
+};
+
 export default function Home() {
   return (
     <div className="min-h-screen relative text-white font-sans selection:bg-cyan-500/30">
