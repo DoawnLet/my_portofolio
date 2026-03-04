@@ -14,22 +14,6 @@ const Box = motion.div as React.FC<any>;
 const Section = motion.section as React.FC<any>;
 
 // ─── Animation variants ───────────────────────────────────────────────────────
-const containerVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
-  },
-};
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
 const headingVariants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
@@ -39,15 +23,61 @@ const headingVariants = {
   },
 };
 
-const iconVariants = {
-  hidden: { scale: 0.8, opacity: 0, rotate: -10 },
+const timelineItemVariantsLeft = {
+  hidden: { opacity: 0, x: -50, y: 30 },
   visible: {
-    scale: 1,
     opacity: 1,
-    rotate: 0,
-    transition: { duration: 0.6, ease: "backOut" },
+    x: 0,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
+
+const timelineItemVariantsRight = {
+  hidden: { opacity: 0, x: 50, y: 30 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
+};
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+const chapters = [
+  {
+    id: 1,
+    title: "The Spark",
+    description:
+      "My tech journey began with curiosity. Writing my first lines of code ignited a fierce passion for shaping digital experiences.",
+    icon: Sparkles,
+    color: "#088395",
+  },
+  {
+    id: 2,
+    title: "The Forge",
+    description:
+      "Thousands of hours of typing, debugging, and learning turned curiosity into expertise. I dove deep into both crafting seamless frontends and building scalable backends.",
+    icon: Code2,
+    color: "#09637E",
+  },
+  {
+    id: 3,
+    title: "The Present",
+    description:
+      "Today, I am a Full-stack Developer eager to push the boundaries of Web Development. I build modern, responsive, and highly optimized solutions.",
+    icon: Rocket,
+    color: "#7AB2B2",
+  },
+  {
+    id: 4,
+    title: "Beyond Code",
+    description:
+      "When I'm not in front of a screen coding, I enjoy exploring new technologies, contributing to open-source, and preparing for the next big challenges.",
+    icon: Heart,
+    color: "#EBF4F6",
+  },
+];
 
 // ─── Premium Spotlight Card ───────────────────────────────────────────────────
 function SpotlightCard({
@@ -74,7 +104,6 @@ function SpotlightCard({
 
   return (
     <Box
-      variants={cardVariants}
       whileHover={{ y: -4, transition: { duration: 0.3, ease: "easeOut" } }}
       onMouseMove={handleMouseMove}
       className={`group relative rounded-3xl overflow-hidden ${className}`}
@@ -86,7 +115,6 @@ function SpotlightCard({
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
       }}
     >
-      {/* 1. Inner surface radial glow that tracks mouse */}
       <motion.div
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
         style={{
@@ -99,11 +127,7 @@ function SpotlightCard({
           `,
         }}
       />
-
-      {/* 2. Top-left soft glass highlight */}
       <div className="pointer-events-none absolute inset-0 rounded-3xl ring-1 ring-inset ring-white/10" />
-
-      {/* Content wrapper */}
       <div className="relative z-10 h-full p-8 md:p-10 flex flex-col">
         {children}
       </div>
@@ -114,8 +138,9 @@ function SpotlightCard({
 // ─── About Section ────────────────────────────────────────────────────────────
 export default function About() {
   const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Scroll-driven parallax on the section blobs
+  // Background parallax
   const { scrollYProgress } = useScroll({
     target: sectionRef as unknown as React.RefObject<HTMLElement>,
     offset: ["start end", "end start"],
@@ -126,13 +151,21 @@ export default function About() {
   const blobBotY = useTransform(scrollYProgress, [0, 1], [60, -120]);
   const blobBotX = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
+  // Timeline Progress
+  const { scrollYProgress: timelineProgress } = useScroll({
+    target: containerRef,
+    offset: ["start 60%", "end 80%"],
+  });
+
+  const lineHeight = useTransform(timelineProgress, [0, 1], ["0%", "100%"]);
+
   return (
     <Section
       id="about"
       ref={sectionRef}
       className="relative py-28 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
-      {/* Background accent blob – top-right */}
+      {/* Background blobs */}
       <Box
         aria-hidden="true"
         style={{
@@ -142,7 +175,6 @@ export default function About() {
         }}
         className="pointer-events-none absolute -top-32 -right-32 w-[560px] h-[560px] rounded-full opacity-[0.12] blur-[80px] will-change-transform"
       />
-      {/* Background accent blob – bottom-left */}
       <Box
         aria-hidden="true"
         style={{
@@ -159,7 +191,7 @@ export default function About() {
           variants={headingVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
+          viewport={{ once: false, amount: 0.3 }}
           className="text-center mb-16"
         >
           <span
@@ -169,11 +201,11 @@ export default function About() {
               backdropFilter: "blur(8px)",
             }}
           >
-            About Me
+            My Story
           </span>
           <h2 className="text-5xl md:text-6xl font-black leading-tight">
             <span className="bg-gradient-to-r from-[#EBF4F6] via-[#7AB2B2] to-[#EBF4F6] bg-clip-text text-transparent">
-              The Person
+              The Journey
             </span>
             <br />
             <span className="bg-gradient-to-r from-[#088395] to-[#09637E] bg-clip-text text-transparent">
@@ -182,160 +214,103 @@ export default function About() {
           </h2>
         </Box>
 
-        {/* ── Bento Box Grid ── */}
-        <Box
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-5"
-        >
-          {/* Card 1: Who I Am (Large, spans 2 cols & 2 rows on desktop) */}
-          <SpotlightCard
-            className="md:col-span-2 md:row-span-2"
-            color="#088395"
-          >
-            <div className="flex-1 flex flex-col justify-center">
-              <Box
-                variants={iconVariants}
-                className="mb-8 inline-flex items-center justify-center w-16 h-16 rounded-2xl shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, #0883951A, #08839533)`,
-                  border: `1px solid #08839540`,
-                }}
-              >
-                <User className="w-8 h-8 text-[#088395]" />
-              </Box>
-              <h3 className="text-3xl md:text-4xl font-bold mb-6 bg-gradient-to-r from-[#EBF4F6] to-[#7AB2B2] bg-clip-text text-transparent">
-                Who I Am
-              </h3>
-              <p className="text-[#7AB2B2]/90 leading-relaxed text-base md:text-lg max-w-xl">
-                I'm a passionate full-stack developer with a love for creating
-                immersive digital experiences. My journey in tech started with
-                curiosity and has evolved into a career dedicated to pushing the
-                boundaries of what's possible in web development.
-              </p>
+        {/* ── Vertical Timeline ── */}
+        <div ref={containerRef} className="relative max-w-4xl mx-auto mt-20">
+          {/* Center Line */}
+          <div className="absolute left-8 md:left-1/2 top-0 bottom-0 w-1 bg-[#7AB2B2]/10 transform md:-translate-x-1/2 rounded-full overflow-hidden">
+            <motion.div
+              className="absolute top-0 left-0 w-full bg-gradient-to-b from-[#088395] via-[#7AB2B2] to-[#EBF4F6]"
+              style={{ height: lineHeight }}
+            />
+          </div>
 
-              {/* Badge Tags */}
-              <div className="flex flex-wrap gap-3 mt-10">
-                {["Frontend", "Backend", "UI/UX", "Problem Solver"].map(
-                  (tag) => (
-                    <span
-                      key={tag}
-                      className="px-4 py-1.5 rounded-full text-sm font-medium border border-[#7AB2B2]/20 bg-[#7AB2B2]/5 text-[#EBF4F6] backdrop-blur-sm transition-colors hover:bg-[#7AB2B2]/20"
-                    >
-                      {tag}
-                    </span>
-                  ),
-                )}
-              </div>
-            </div>
-          </SpotlightCard>
+          <div className="flex flex-col gap-16 md:gap-24 relative z-10 py-10">
+            {chapters.map((chapter, index) => {
+              const isEven = index % 2 === 0;
+              const Icon = chapter.icon;
 
-          {/* Card 2: What I Do (Small) */}
-          <SpotlightCard
-            className="md:col-span-1 md:row-span-1"
-            color="#09637E"
-          >
-            <Box
-              variants={iconVariants}
-              className="mb-5 inline-flex items-center justify-center w-12 h-12 rounded-xl shrink-0"
-              style={{
-                background: `linear-gradient(135deg, #09637E1A, #09637E33)`,
-                border: `1px solid #09637E40`,
-              }}
-            >
-              <Code2 className="w-6 h-6 text-[#09637E]" />
-            </Box>
-            <h3 className="text-xl font-bold mb-3 text-[#EBF4F6]">What I Do</h3>
-            <p className="text-[#7AB2B2]/80 leading-relaxed text-sm">
-              I specialize in modern web technologies, from responsive front-end
-              interfaces to scalable back-end systems.
-            </p>
-          </SpotlightCard>
-
-          {/* Card 3: Beyond Code (Small) */}
-          <SpotlightCard
-            className="md:col-span-1 md:row-span-1"
-            color="#7AB2B2"
-          >
-            <Box
-              variants={iconVariants}
-              className="mb-5 inline-flex items-center justify-center w-12 h-12 rounded-xl shrink-0"
-              style={{
-                background: `linear-gradient(135deg, #7AB2B21A, #7AB2B233)`,
-                border: `1px solid #7AB2B240`,
-              }}
-            >
-              <Heart className="w-6 h-6 text-[#7AB2B2]" />
-            </Box>
-            <h3 className="text-xl font-bold mb-3 text-[#EBF4F6]">
-              Beyond Code
-            </h3>
-            <p className="text-[#7AB2B2]/80 leading-relaxed text-sm">
-              When I'm not coding, you'll find me exploring new technologies,
-              contributing to open-source, or sharing knowledge.
-            </p>
-          </SpotlightCard>
-
-          {/* Card 4: My Mission (Wide, spans 3 cols) */}
-          <SpotlightCard
-            className="md:col-span-3 md:row-span-1 flex flex-col"
-            color="#EBF4F6"
-          >
-            <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-12 w-full h-full">
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-5">
-                  <Box
-                    variants={iconVariants}
-                    className="inline-flex items-center justify-center w-12 h-12 rounded-xl shrink-0"
-                    style={{
-                      background: `linear-gradient(135deg, #EBF4F61A, #EBF4F633)`,
-                      border: `1px solid #EBF4F640`,
-                    }}
-                  >
-                    <Rocket className="w-6 h-6 text-[#EBF4F6]" />
-                  </Box>
-                  <h3 className="text-2xl font-bold text-[#EBF4F6]">
-                    My Mission
-                  </h3>
-                </div>
-                <p className="text-[#7AB2B2]/80 leading-relaxed text-base md:text-lg max-w-3xl">
-                  To create digital solutions that not only function flawlessly
-                  but also inspire and delight users. I believe in the power of
-                  technology to solve real-world problems and improve lives.
-                </p>
-              </div>
-
-              {/* Decorative element for large screens */}
-              <div className="hidden md:flex relative w-32 h-32 shrink-0 items-center justify-center ml-auto">
-                <div className="absolute inset-0 bg-gradient-to-tr from-[#088395]/20 to-[#7AB2B2]/30 rounded-full blur-2xl animate-pulse" />
-                <motion.div
-                  animate={{
-                    y: [-5, 5, -5],
-                    rotate: [-5, 5, -5],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  className="relative z-10"
+              return (
+                <div
+                  key={chapter.id}
+                  className={`relative flex flex-col md:flex-row items-center w-full ${isEven ? "md:flex-row-reverse" : ""}`}
                 >
-                  <Sparkles className="w-12 h-12 text-[#7AB2B2]" />
-                </motion.div>
-              </div>
-            </div>
-          </SpotlightCard>
-        </Box>
+                  {/* Content */}
+                  <div
+                    className={`w-full md:w-1/2 ${isEven ? "md:pl-16" : "md:pr-16"} pl-24 pr-4 md:px-0`}
+                  >
+                    <motion.div
+                      variants={
+                        isEven
+                          ? timelineItemVariantsRight
+                          : timelineItemVariantsLeft
+                      }
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: false, margin: "-100px" }}
+                    >
+                      <SpotlightCard color={chapter.color}>
+                        <div className="flex items-center gap-4 mb-4">
+                          <span className="text-[#7AB2B2]/50 font-bold text-5xl opacity-30 absolute -top-4 -right-2">
+                            0{chapter.id}
+                          </span>
+                          <h3 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#EBF4F6] to-[#7AB2B2] bg-clip-text text-transparent relative z-10">
+                            {chapter.title}
+                          </h3>
+                        </div>
+                        <p className="text-[#7AB2B2]/90 leading-relaxed text-base relative z-10">
+                          {chapter.description}
+                        </p>
+                      </SpotlightCard>
+                    </motion.div>
+                  </div>
+
+                  {/* Node */}
+                  <div className="absolute left-8 md:left-1/2 transform -translate-x-1/2 flex items-center justify-center z-20">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: false, margin: "-100px" }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 15,
+                        delay: 0.2,
+                      }}
+                      className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center"
+                      style={{
+                        background: "rgba(10, 17, 24, 0.8)",
+                        backdropFilter: "blur(12px)",
+                        WebkitBackdropFilter: "blur(12px)",
+                        boxShadow: `0 0 20px ${chapter.color}40`,
+                      }}
+                    >
+                      <div
+                        className="w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center"
+                        style={{
+                          background: `linear-gradient(135deg, ${chapter.color}2A, ${chapter.color}4D)`,
+                          border: `2px solid ${chapter.color}`,
+                        }}
+                      >
+                        <Icon
+                          className="w-5 h-5 md:w-6 md:h-6"
+                          style={{ color: "#EBF4F6" }}
+                        />
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* ── CTA banner ── */}
         <Box
           variants={headingVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.4 }}
-          className="mt-16 rounded-3xl p-10 text-center relative overflow-hidden"
+          viewport={{ once: false, amount: 0.4 }}
+          className="mt-24 rounded-3xl p-10 text-center relative overflow-hidden"
           style={{
             background: "rgba(122,178,178,0.04)",
             backdropFilter: "blur(20px)",
@@ -343,7 +318,6 @@ export default function About() {
             border: "1px solid rgba(8,131,149,0.14)",
           }}
         >
-          {/* Shine line top */}
           <div
             aria-hidden="true"
             className="absolute top-0 left-1/4 right-1/4 h-px"
